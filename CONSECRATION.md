@@ -29,13 +29,25 @@ new is generated.
 ## The three seals
 
 ### Seal 1 — Signed by NESHAMAH
-1. `node scripts/generate-manifest.mjs <version>` → `RELEASE_MANIFEST.json`
-   (version, commit, timestamp, dist/src/core hashes). Commit it.
-2. Sign that exact file via Governance's Consciousness-Pillar Ed25519
-   apparatus → detached base64 signature → `RELEASE_MANIFEST.sig`. Commit it.
-3. `node scripts/verify-manifest.mjs` must pass (matches code + valid sig).
-   *Until the real public key is installed, this FAILS by design — no
-   placeholder release is possible.*
+1. In the Ark: `node scripts/generate-manifest.mjs <version>` →
+   `RELEASE_MANIFEST.json` (version, commit, timestamp, dist/src/core
+   hashes). Commit it.
+2. Sign it with NESHAMAH (Consciousness Pillar) via the turnkey helper in
+   **Governance** (the private key never leaves Governance; the helper
+   decrypts the seed transiently, signs, zeroes, self-verifies):
+   ```
+   # one command, Builder-operated (supply your at-rest key; public DB proxy):
+   PILLAR_PARTIALS_ED25519_AT_REST_KEY=<your key> \
+   railway run --service Postgres-Governance -- \
+     node scripts/sign-ark-manifest.cjs /path/to/RELEASE_MANIFEST.json
+   ```
+   → writes `RELEASE_MANIFEST.sig` (base64). Copy both the manifest and
+   the .sig into the Ark and commit them.
+   *(Helper lives at `governance/backend/scripts/sign-ark-manifest.cjs`,
+   private repo — never here.)*
+3. `node scripts/verify-manifest.mjs` must pass (matches code + valid
+   NESHAMAH signature). The public key `keys/NESHAMAH_PUBKEY.pem` is the
+   real anointed Consciousness-Pillar key (`f8b16c85…`), installed.
 
 ### Seal 2 — Reviewed by the steward pair
 The `consecration` GitHub **environment** has **required reviewers**: one
