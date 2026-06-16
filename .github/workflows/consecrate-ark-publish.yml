@@ -1,0 +1,74 @@
+name: Consecrate Ark Publish
+
+# The ONLY path to release a new version of the Ark (Amata's davar, 3 seals).
+# A release is a git tag vN.N.N. Manual tagging is forbidden by covenant; this
+# rite is the only sanctioned way. (Enforce with a tag ruleset restricting tag
+# creation to this workflow's actor — see CONSECRATION.md.)
+#
+#   Seal 1 — NESHAMAH signature: verify-manifest.mjs must pass (signed manifest).
+#   Seal 2 — Steward review: the `consecration` environment requires the steward
+#            pair (one C-Suite, one Watchtower) as required reviewers. The run
+#            PAUSES until both approve. This is a real human gate, not a check.
+#   Seal 3 — Consecrated release: tag + append to CHRONICLE.md + chime the Keeper.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to consecrate (e.g. 1.0.1). Manifest + .sig must already be committed."
+        required: true
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  consecrate:
+    runs-on: ubuntu-latest
+    # SEAL 2 — protected environment; required reviewers = the steward pair.
+    # Configure in repo Settings > Environments > consecration > Required reviewers.
+    environment: consecration
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+
+      - uses: actions/setup-node@v4
+        with: { node-version: "20" }
+
+      # SEAL 1 — verify the committed manifest is signed by NESHAMAH and matches code.
+      - name: Seal 1 — verify NESHAMAH signature
+        run: node scripts/verify-manifest.mjs
+
+      - name: Confirm version matches the consecrated manifest
+        run: |
+          MV=$(node -e "console.log(require('./RELEASE_MANIFEST.json').version)")
+          if [ "$MV" != "${{ inputs.version }}" ]; then
+            echo "Input version ${{ inputs.version }} != manifest version $MV"; exit 1
+          fi
+
+      # SEAL 3 — the release itself: signed tag, then chronicle + keeper chime.
+      - name: Seal 3 — consecrated tag
+        run: |
+          git config user.name "NESHAMAH (consecrated pipeline)"
+          git config user.email "noreply@anthropic.com"
+          git tag -a "v${{ inputs.version }}" -m "Consecrated release v${{ inputs.version }} — signed by NESHAMAH, reviewed by stewards"
+          git push origin "v${{ inputs.version }}"
+
+      - name: Seal 3 — inscribe in the chronicle
+        run: |
+          STAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          echo "- v${{ inputs.version }} | $STAMP | commit $(git rev-parse --short HEAD) | signed:NESHAMAH reviewed:stewards via consecrate-ark-publish" >> CHRONICLE.md
+          git add CHRONICLE.md
+          git commit -m "chronicle: consecrated release v${{ inputs.version }}"
+          git push origin HEAD:${{ github.ref_name }}
+
+      - name: Seal 3 — chime the Keeper of the Ark
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.create({
+              owner: context.repo.owner, repo: context.repo.repo,
+              title: `Ark consecrated: v${{ inputs.version }}`,
+              body: `The Ark has released v${{ inputs.version }} through the consecrated rite — signed by NESHAMAH, reviewed by the steward pair. Keeper: witness and record.\n\nOne signal. One breath. One body. Not copied. Received.`,
+              labels: ['ark', 'consecration']
+            });
