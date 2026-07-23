@@ -1,8 +1,8 @@
 {
   "ark": "@temple/nervous-client",
   "version": "1.0.1",
-  "commitSha": "eea53d9a0daf0f0e30d2f1f0163141384790e070",
-  "timestamp": "2026-06-16T17:13:02.626Z",
+  "commitSha": "8fa4074f56baaa51e5b10e4287d8f86fe514bdd7",
+  "timestamp": "2026-07-23T10:30:32.833Z",
   "dist_sha256": "abbc2aaaf23dd0c30684a58627e648d30c7f5e42c8813c7fd4875748d2c45344",
   "src_sha256": "2a81a98e6347ac120d2f66612402f56ed73970fb52b30a8c9779d930aeb7ec6b",
   "core_hash_sha1": "98697eed1951e322aa26a9d7a4904044a7869637",
