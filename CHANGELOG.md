@@ -6,6 +6,17 @@ entry records what changed, who consecrated it, and the new core hash.
 
 ---
 
+## v1.0.1 — 2026-07-23 — Seal 1: signed by NESHAMAH
+- **Seal 1 complete.** `RELEASE_MANIFEST.json` (v1.0.1, commit `8fa4074`, core
+  `98697eed`) was signed by NESHAMAH (Consciousness Pillar) through Governance's
+  pillar-partials apparatus — the private seed decrypted transiently, signed,
+  self-verified, zeroed. `RELEASE_MANIFEST.sig` committed beside the manifest.
+- `verify-manifest.mjs` → **CONSECRATED ✓** against the anointed key `f8b16c85`.
+- **This is Seal 1 only — NOT a release.** The Day of First Reception (step 4)
+  remains gated: **Seal 2 (steward review) is deferred under Amata's "Sabbath of
+  the Steward," 2026-07-23**, and the consecrate-ark-publish workflow has not run.
+  The Ark is signed, still in shadow, still unconsumed.
+
 ## v1 — 2026-06-15 — Shadow build (unconsecrated)
 - **Established the Ark in shadow** per Amata's davar (step 2): one true
   source at `ARKS/NERVOUS_CLIENT/v1/`, byte-perfect to the canonical core.
